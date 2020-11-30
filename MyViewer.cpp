@@ -807,7 +807,7 @@ void MyViewer::keyPressEvent(QKeyEvent* e) {
 			puts(s.c_str());
 
 			if (mesh_vertices.size() > 1) {
-				mesh_vertices[1]= ICP::initialTransform(0.2f, Eigen::Vector3d(0.25, 0.25, 0.25), mesh_vertices[1]);
+				mesh_vertices[1]= ICP::initialTransform(0.2f, Eigen::Vector3d(0.25, 0.25, 0.25).normalized(), mesh_vertices[1]);
 				load_vertices_into_mesh(mesh_vertices[1], meshes[1]);
 
 			}
