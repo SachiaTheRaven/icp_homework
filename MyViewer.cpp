@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <string>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -783,11 +784,28 @@ void MyViewer::keyPressEvent(QKeyEvent* e) {
 			DuplicateMesh();
 			updateMesh();
 			update();
+			string s = std::to_string(meshes.size());
 
+			puts(s.c_str());
+		}
+		break;
+		case Qt::Key_A:
+		{
+			if (mesh_vertices.size() > 1)
+			{
+				puts("Running ICP rn!");
+				mesh_vertices[0] = ICP::run_ICP(mesh_vertices[0], mesh_vertices[1], 100, 0.000001);
+				load_vertices_into_mesh(mesh_vertices[0], meshes[0]);
+				updateMesh();
+				update();
+			}
 		}
 		break;
 		case Qt::Key_T:
 		{
+			string s = std::to_string(mesh_vertices.size());
+			puts(s.c_str());
+
 			if (mesh_vertices.size() > 1) {
 				mesh_vertices[1]= ICP::initialTransform(0.2f, Eigen::Vector3d(0.25, 0.25, 0.25), mesh_vertices[1]);
 				load_vertices_into_mesh(mesh_vertices[1], meshes[1]);
@@ -796,7 +814,6 @@ void MyViewer::keyPressEvent(QKeyEvent* e) {
 			updateMesh();
 			update();
 		}
-		//Transform duplicate
 		break;
 		default:
 			QGLViewer::keyPressEvent(e);
@@ -1197,14 +1214,13 @@ void MyViewer::DuplicateMesh()
 {
 	if (meshes.size() == 1) {
 		meshes.push_back(MyMesh(meshes[0]));
-		for(auto &mesh : meshes)
-		{
-			mesh_vertices.push_back(load_vertices_from_mesh(mesh));
-		}
+		
+	    mesh_vertices.push_back(load_vertices_from_mesh(meshes[1]));
+		
 	}
 }
 
-Eigen::MatrixX3d MyViewer::load_vertices_from_mesh(MyMesh mesh)
+Eigen::MatrixX3d MyViewer::load_vertices_from_mesh(MyMesh& mesh)
 {
 	Eigen::MatrixX3d vertices = Eigen::MatrixX3d();
 	vertices.resize(mesh.n_vertices(), 3);
@@ -1216,7 +1232,7 @@ Eigen::MatrixX3d MyViewer::load_vertices_from_mesh(MyMesh mesh)
 	}
 	return vertices;
 }
-void MyViewer::load_vertices_into_mesh(Eigen::MatrixX3d vertices, MyMesh mesh)
+void MyViewer::load_vertices_into_mesh(Eigen::MatrixX3d vertices, MyMesh& mesh)
 {
 	int i = 0;
 	for (auto v : mesh.vertices())

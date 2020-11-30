@@ -1,14 +1,3 @@
 ﻿  Generate moc_predefs.h
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(238,5): warning MSB8064: Custom build for item "release\moc_predefs.h.cbt" succeeded, but specified dependency "c:\users\lenovo\documents\bme\3dga\sample-framework-master\icp_homework\release\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
-  MyViewer.cpp
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(322,30): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(415,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(416,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(656,16): warning C4267: 'argument': conversion from 'size_t' to 'GLuint', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(1035,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(1036,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(1144,20): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(1145,20): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(1188,32): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\MyViewer.cpp(1189,32): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
   sample-framework.vcxproj -> C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\icp_homework\release\sample-framework.exe

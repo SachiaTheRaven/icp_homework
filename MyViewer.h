@@ -116,8 +116,8 @@ private:
 	void DrawMesh(MyMesh mesh);
 	void DuplicateMesh();
 
-	Eigen::MatrixX3d load_vertices_from_mesh(MyMesh mesh);
-	void load_vertices_into_mesh(Eigen::MatrixX3d vertices,MyMesh mesh);
+	Eigen::MatrixX3d load_vertices_from_mesh(MyMesh& mesh);
+	void load_vertices_into_mesh(Eigen::MatrixX3d vertices,MyMesh &mesh);
 
 
 	// Bezier

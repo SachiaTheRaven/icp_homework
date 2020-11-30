@@ -106,7 +106,7 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 }
 
 
-/*Eigen::Vector4d ICP::calculate_center_of_mass(Eigen::MatrixX3d vertices)
+Eigen::Vector4d ICP::calculate_center_of_mass(Eigen::MatrixX3d vertices)
 {
 	Eigen::Vector4d center(0, 0, 0,1);
 	for (int i = 0; i < vertices.rows(); i++)
@@ -117,8 +117,8 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 	center.head(3) /= vertices.rows();
 	return center;
 }
-*/
-/*Eigen::Matrix4d ICP::calculate_rotation_base(int n, Eigen::Vector3d center1, Eigen::Vector3d center2,
+
+Eigen::Matrix4d ICP::calculate_rotation_base(int n, Eigen::Vector3d center1, Eigen::Vector3d center2,
 	Eigen::MatrixX3d src, Eigen::MatrixX3d dst, std::map<int, std::pair<int, double>> matches)
 {
 	//cross-covariance mtx
@@ -147,20 +147,20 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 
 	return Q;
 }
-*/
-/*Eigen::Quaternionf ICP::calculate_max_eigen(Eigen::Matrix4d mat)
+
+Eigen::Quaterniond ICP::calculate_max_eigen(Eigen::Matrix4d mat)
 {
 	Eigen::EigenSolver<Eigen::Matrix4d> solver(mat,true);
-	Eigen::Vector4cf vals = solver.eigenvalues();
+	Eigen::Vector4cd vals = solver.eigenvalues();
 	Eigen::Vector4d real_vals = vals.real();
 	Eigen::Matrix4d::Index maxindex;
-	/*Eigen::scomplex maxval = *//*real_vals.maxCoeff(&maxindex);
+	Eigen::scomplex maxval = real_vals.maxCoeff(&maxindex);
 	auto maxvector = solver.eigenvectors().col(maxindex);
-	Eigen::Quaternionf quat(maxvector[0].real(), maxvector[1].real(), maxvector[2].real(), maxvector[3].real());
+	Eigen::Quaterniond quat(maxvector[0].real(), maxvector[1].real(), maxvector[2].real(), maxvector[3].real());
 	return quat;
 }
-*/
-/*double ICP::calculate_mean_squared_error(std::map<int, std::pair<int, double>> pairs)
+
+double ICP::calculate_mean_squared_error(std::map<int, std::pair<int, double>> pairs)
 {
 	double meansquared = 0;
 	for (auto pair : pairs)
@@ -170,8 +170,8 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 	meansquared /= pairs.size();
 	return meansquared;
 }
-*/
-/*Eigen::MatrixX3d ICP::ICPIteration(Eigen::MatrixX3d src, Eigen::MatrixX3d dst, std::map<int, std::pair<int, double>> closest_pairs)
+
+Eigen::MatrixX3d ICP::ICPIteration(Eigen::MatrixX3d src, Eigen::MatrixX3d dst, std::map<int, std::pair<int, double>> closest_pairs)
 {
 
 	Eigen::Vector4d center_of_mass_src = calculate_center_of_mass(src);
@@ -179,7 +179,7 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 
 
 	Eigen::Matrix4d rotation_base_mtx = calculate_rotation_base(src.rows(), center_of_mass_src.head(3), center_of_mass_dst.head(3), src, dst, closest_pairs);
-	Eigen::Quaternionf quatR = calculate_max_eigen(rotation_base_mtx);
+	Eigen::Quaterniond quatR = calculate_max_eigen(rotation_base_mtx);
 	Eigen::Matrix3d quatRMat = quatR.normalized().toRotationMatrix();
 
 	//convert rotmat to 4d
@@ -209,9 +209,8 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 	new_src.transpose()=trans_rot* src_4d.transpose();
 	return new_src.block(0,0,rows,3);
 }
-*/
 
-/*Eigen::MatrixX3d ICP::run_ICP(Eigen::MatrixX3d src, Eigen::MatrixX3d dst, int maxiter, double minerror)
+Eigen::MatrixX3d ICP::run_ICP(Eigen::MatrixX3d src, Eigen::MatrixX3d dst, int maxiter, double minerror)
 {
 	int i = 0;
 	double error = 10000000; //sok
@@ -225,7 +224,7 @@ Eigen::MatrixX3d ICP::initialTransform(double rad_angle, Eigen::Vector3d axis, E
 	}
 
 	return src;
-}*/
+}
 /*int main(int argc, char* argv[])
 {
 	cout << "I'm running!\n";
