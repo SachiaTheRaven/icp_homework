@@ -1,0 +1,24 @@
+﻿  Generate moc_predefs.h
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(238,5): warning MSB8064: Custom build for item "release\moc_predefs.h.cbt" succeeded, but specified dependency "c:\users\lenovo\documents\bme\3dga\sample-framework-master\release\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
+  Moc'ing MyViewer.h...
+  MyViewer.cpp
+  MyWindow.cpp
+  main.cpp
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\ICPProject.h(30,2): warning C4091: 'static ': ignored on left of 'ICP' when no variable is declared (compiling source file main.cpp)
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\ICPProject.h(30,2): warning C4091: 'static ': ignored on left of 'ICP' when no variable is declared (compiling source file MyViewer.cpp)
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\ICPProject.h(30,2): warning C4091: 'static ': ignored on left of 'ICP' when no variable is declared (compiling source file MyWindow.cpp)
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(318,30): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(404,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(405,12): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(616,16): warning C4267: 'argument': conversion from 'size_t' to 'GLuint', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(992,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(993,19): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(1101,20): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(1102,20): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(1145,32): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\MyViewer.cpp(1146,32): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  moc_MyViewer.cpp
+  moc_MyWindow.cpp
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\ICPProject.h(30,2): warning C4091: 'static ': ignored on left of 'ICP' when no variable is declared (compiling source file Release\moc_MyViewer.cpp)
+C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\ICPProject.h(30,2): warning C4091: 'static ': ignored on left of 'ICP' when no variable is declared (compiling source file Release\moc_MyWindow.cpp)
+  sample-framework.vcxproj -> C:\Users\Lenovo\Documents\bme\3dga\sample-framework-master\release\sample-framework.exe
