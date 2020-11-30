@@ -32,6 +32,10 @@
 #endif
 using namespace OpenMesh;
 
+GLdouble color1[] = { 0.9,0.2,0.9 };
+GLdouble color2[] = { 0.2,0.9,0.9 };
+
+
 MyViewer::MyViewer(QWidget* parent) :
 	QGLViewer(parent), model_type(ModelType::NONE),
 	mean_min(0.0), mean_max(0.0), cutoff_ratio(0.05),
@@ -128,7 +132,7 @@ double MyViewer::voronoiWeight(MyMesh mesh, MyViewer::MyMesh::HalfedgeHandle in_
 void MyViewer::updateMeanCurvature(bool update_min_max) {
 	std::map<MyMesh::FaceHandle, double> face_area;
 	std::map<MyMesh::VertexHandle, double> vertex_area;
-	for (auto mesh : meshes) {
+	for(auto &mesh : meshes) {
 		for (auto f : mesh.faces())
 			face_area[f] = mesh.calc_sector_area(mesh.halfedge_handle(f));
 
@@ -308,7 +312,7 @@ Vec MyViewer::meanMapColor(double d) const {
 void MyViewer::fairMesh() {
 	if (model_type != ModelType::MESH)
 		return;
-	for (auto mesh : meshes) {
+	for(auto &mesh : meshes) {
 		emit startComputation(tr("Fairing mesh..."));
 		OpenMesh::Smoother::JacobiLaplaceSmootherT<MyMesh> smoother(mesh);
 		smoother.initialize(OpenMesh::Smoother::SmootherT<MyMesh>::Normal, // or: Tangential_and_Normal
@@ -326,7 +330,7 @@ void MyViewer::updateVertexNormals() {
 	// Weights according to:
 	//   N. Max, Weights for computing vertex normals from facet normals.
 	//     Journal of Graphics Tools, Vol. 4(2), 1999.
-	for (auto mesh : meshes) {
+	for(auto &mesh : meshes) {
 		for (auto v : mesh.vertices()) {
 			Vector n(0.0, 0.0, 0.0);
 			for (auto h : mesh.vih_range(v)) {
@@ -348,7 +352,8 @@ void MyViewer::updateVertexNormals() {
 void MyViewer::updateMesh(bool update_mean_range) {
 	if (model_type == ModelType::BEZIER_SURFACE)
 		generateMesh(meshes[0]);
-	for (auto mesh : meshes) {
+
+	for(auto &mesh : meshes) {
 		mesh.request_face_normals(); mesh.request_vertex_normals();
 		mesh.update_face_normals(); //mesh.update_vertex_normals();
 	}
@@ -378,15 +383,21 @@ void MyViewer::setupCamera() {
 	update();
 }
 
-bool MyViewer::openMesh(const std::string& filename, bool update_view) {
-	OpenMesh::TriMesh_ArrayKernelT<MyTraits> mesh1;
+bool MyViewer::openMesh(const std::string& filename, bool update_view, bool isPointCloud) {
 	MyMesh mesh;
 
 	if (!OpenMesh::IO::read_mesh(mesh, filename) || mesh.n_vertices() == 0)
 		return false;
 	meshes.push_back(mesh);
-	model_type = ModelType::MESH;
 	last_filename = filename;
+
+	if (!isPointCloud) {
+		model_type = ModelType::MESH;
+	}
+	else {
+		mesh_vertices.push_back(load_vertices_from_mesh(mesh));
+		model_type = ModelType::POINT_CLOUD;
+	}
 	updateMesh(update_view);
 	if (update_view)
 		setupCamera();
@@ -470,86 +481,115 @@ void MyViewer::init() {
 
 
 void MyViewer::draw() {
-
-	for (auto mesh : meshes) {
+	int i = 0;
+	for(auto &mesh : meshes) {
 		if (model_type == ModelType::BEZIER_SURFACE && show_control_points)
 			drawControlNet();
-
+		
 		glPolygonMode(GL_FRONT_AND_BACK, !show_solid && show_wireframe ? GL_LINE : GL_FILL);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1, 1);
 
-		if (show_solid || show_wireframe) {
-			if (visualization == Visualization::PLAIN)
-				glColor3d(1.0, 1.0, 1.0);
-			else if (visualization == Visualization::ISOPHOTES) {
-				glBindTexture(GL_TEXTURE_2D, current_isophote_texture);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-				glEnable(GL_TEXTURE_2D);
-				glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-				glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-				glEnable(GL_TEXTURE_GEN_S);
-				glEnable(GL_TEXTURE_GEN_T);
-			}
-			else if (visualization == Visualization::SLICING) {
-				glBindTexture(GL_TEXTURE_1D, slicing_texture);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-				glEnable(GL_TEXTURE_1D);
-			}
-
-			for (auto f : mesh.faces()) {
-				glBegin(GL_POLYGON);
-
-				for (auto v : mesh.fv_range(f)) {
-					if (mesh.data(f).toBeColored)
-					{
-						glColor3d(1.0, 0.0, 0.0);
-
-					}
-					else
-					{
-						glColor3d(1.0, 1.0, 1.0);
-
-					}
-					if (visualization == Visualization::MEAN)
-						glColor3dv(meanMapColor(mesh.data(v).mean));
-					else if (visualization == Visualization::SLICING)
-						glTexCoord1d(mesh.point(v).dot(slicing_dir * slicing_scaling));
-
-					glNormal3dv(mesh.normal(v).data());
-					glVertex3dv(mesh.point(v).data());
-
+		if (model_type != ModelType::POINT_CLOUD)
+		{
+			if (show_solid || show_wireframe) {
+				if (visualization == Visualization::PLAIN)
+					glColor3d(1.0, 1.0, 1.0);
+				else if (visualization == Visualization::ISOPHOTES) {
+					glBindTexture(GL_TEXTURE_2D, current_isophote_texture);
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+					glEnable(GL_TEXTURE_2D);
+					glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+					glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+					glEnable(GL_TEXTURE_GEN_S);
+					glEnable(GL_TEXTURE_GEN_T);
 				}
-				glEnd();
-			}
+				else if (visualization == Visualization::SLICING) {
+					glBindTexture(GL_TEXTURE_1D, slicing_texture);
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+					glEnable(GL_TEXTURE_1D);
+				}
 
-			if (visualization == Visualization::ISOPHOTES) {
-				glDisable(GL_TEXTURE_GEN_S);
-				glDisable(GL_TEXTURE_GEN_T);
-				glDisable(GL_TEXTURE_2D);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			}
-			else if (visualization == Visualization::SLICING) {
-				glDisable(GL_TEXTURE_1D);
-			}
-
-
-			if (show_solid && show_wireframe) {
-				glPolygonMode(GL_FRONT, GL_LINE);
-				glColor3d(0.0, 0.0, 0.0);
-				glDisable(GL_LIGHTING);
 				for (auto f : mesh.faces()) {
 					glBegin(GL_POLYGON);
-					for (auto v : mesh.fv_range(f))
+
+					for (auto v : mesh.fv_range(f)) {
+						if (mesh.data(f).toBeColored)
+						{
+							glColor3d(1.0, 0.0, 0.0);
+
+						}
+						else
+						{
+							glColor3d(1.0, 1.0, 1.0);
+
+						}
+						if (visualization == Visualization::MEAN)
+							glColor3dv(meanMapColor(mesh.data(v).mean));
+						else if (visualization == Visualization::SLICING)
+							glTexCoord1d(mesh.point(v).dot(slicing_dir * slicing_scaling));
+
+						glNormal3dv(mesh.normal(v).data());
 						glVertex3dv(mesh.point(v).data());
+
+					}
 					glEnd();
 				}
-				glEnable(GL_LIGHTING);
-			}
 
-			if (axes.shown)
-				drawAxes();
+				if (visualization == Visualization::ISOPHOTES) {
+					glDisable(GL_TEXTURE_GEN_S);
+					glDisable(GL_TEXTURE_GEN_T);
+					glDisable(GL_TEXTURE_2D);
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				}
+				else if (visualization == Visualization::SLICING) {
+					glDisable(GL_TEXTURE_1D);
+				}
+
+
+				if (show_solid && show_wireframe) {
+					glPolygonMode(GL_FRONT, GL_LINE);
+					
+					glColor3d(0.0,0.0,0.0);
+					glDisable(GL_LIGHTING);
+					for (auto f : mesh.faces()) {
+						glBegin(GL_POLYGON);
+						for (auto v : mesh.fv_range(f))
+							glVertex3dv(mesh.point(v).data());
+						glEnd();
+					}
+					glEnable(GL_LIGHTING);
+				}
+
+				if (axes.shown)
+					drawAxes();
+			}
 		}
+		else
+		{
+			glPointSize(5.0);
+
+			if (i == 0)
+				glColor3d(color1[0], color1[1], color1[2]);
+			else
+				glColor3d(color2[0], color2[1], color2[2]);			glDisable(GL_LIGHTING);
+			glBegin(GL_POINTS);
+
+			for (auto v : mesh.vertices()) {
+				//glNormal3dv(mesh.normal(v).data());
+				glVertex3dv(mesh.point(v).data());
+			}
+			glEnd();
+
+			glEnable(GL_LIGHTING);
+
+			glPointSize(1.0);
+
+
+
+		}
+		i++;
+
 	}
 }
 
@@ -599,7 +639,7 @@ void MyViewer::drawWithNames() {
 	case ModelType::MESH:
 		if (!show_wireframe)
 			return;
-		for (auto mesh : meshes)
+		for(auto &mesh : meshes)
 		{
 			for (auto v : mesh.vertices()) {
 				glPushName(v.idx());
@@ -654,7 +694,7 @@ void MyViewer::postSelection(const QPoint& p) {
 	selected_vertex = sel;
 	if (model_type == ModelType::MESH)
 	{
-		for (auto mesh : meshes) {
+		for(auto &mesh : meshes) {
 			if (mesh.point(MyMesh::VertexHandle(sel)).any())
 			{
 				axes.position = Vec(mesh.point(MyMesh::VertexHandle(sel)).data());
@@ -680,6 +720,9 @@ void MyViewer::keyPressEvent(QKeyEvent* e) {
 				openMesh(last_filename, false);
 			else if (model_type == ModelType::BEZIER_SURFACE)
 				openBezier(last_filename, false);
+			else if(model_type==ModelType::POINT_CLOUD)
+				openMesh(last_filename, false,true);
+
 			update();
 			break;
 		case Qt::Key_O:
@@ -1154,7 +1197,7 @@ void MyViewer::DuplicateMesh()
 {
 	if (meshes.size() == 1) {
 		meshes.push_back(MyMesh(meshes[0]));
-		for (auto mesh : meshes)
+		for(auto &mesh : meshes)
 		{
 			mesh_vertices.push_back(load_vertices_from_mesh(mesh));
 		}
@@ -1178,7 +1221,7 @@ void MyViewer::load_vertices_into_mesh(Eigen::MatrixX3d vertices, MyMesh mesh)
 	int i = 0;
 	for (auto v : mesh.vertices())
 	{
-		mesh.point(v) = vertices.row(i);
+		mesh.set_point(v,vertices.row(i));
 		i++;
 	}
 }

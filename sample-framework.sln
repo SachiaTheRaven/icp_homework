@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample-framework", "sample-framework.vcxproj", "{F0AFA081-A37C-39CB-8C72-35C6152AB4B3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QGLViewer", "..\..\..\..\..\..\Dev\libQGLViewer-2.7.2\QGLViewer\QGLViewer.vcxproj", "{4DD89223-0C7E-30B7-8D5D-C982C1A8AC14}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QGLViewer", "..\..\..\..\..\..\..\Dev\libQGLViewer-2.7.2\QGLViewer\QGLViewer.vcxproj", "{4DD89223-0C7E-30B7-8D5D-C982C1A8AC14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

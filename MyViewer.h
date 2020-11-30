@@ -45,7 +45,7 @@ public:
 	Vec PartialUU(double u, double v, std::vector<double> bernsteinU, std::vector<double>bernsteinV);
 	Vec PartialVV(double u, double v, std::vector<double> bernsteinU, std::vector<double>bernsteinV);
 	void ElevateBezier();
-	bool openMesh(const std::string& filename, bool update_view = true);
+	bool openMesh(const std::string& filename, bool update_view = true, bool is_point_cloud=true);
 	bool openBezier(const std::string& filename, bool update_view = true);
 	bool saveBezier(const std::string& filename);
 
@@ -84,6 +84,8 @@ private:
 		using Point = Eigen::Vector3d;
 		using Normal = Eigen::Vector3d;
 		///using TexCoord2D = Eigen::Vector2d;
+
+	
 		VertexTraits{
 			double mean;              // approximated mean curvature
 			double u;
@@ -97,6 +99,8 @@ private:
 
 	using Vector = Eigen::Vector3d; //OpenMesh::VectorT<double, 3>;
 	using MyMesh = OpenMesh::TriMesh_ArrayKernelT<EigenTraits>; //changed from MyTraits
+
+
 
 
 	double GetMeanCurvatureOfBezier(MyMesh mesh, OpenMesh::VertexHandle vtx);
@@ -135,7 +139,7 @@ private:
 	// Member variables //
 	//////////////////////
 
-	enum class ModelType { NONE, MESH, BEZIER_SURFACE } model_type;
+	enum class ModelType { NONE, MESH, BEZIER_SURFACE, POINT_CLOUD } model_type;
 	
 	// Mesh
 	std::vector<MyMesh> meshes;

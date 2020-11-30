@@ -79,7 +79,7 @@ void MyWindow::open() {
   if (filename.endsWith(".bzr"))
     ok = viewer->openBezier(filename.toUtf8().data());
   else
-    ok = viewer->openMesh(filename.toUtf8().data());
+    ok = viewer->openMesh(filename.toUtf8().data(),true);
 
   if (!ok)
     QMessageBox::warning(this, tr("Cannot open file"),
