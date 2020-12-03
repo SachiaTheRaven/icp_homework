@@ -1,8 +1,11 @@
 #include <fstream>
+#include <nanoflann.hpp>
 #include "ICPProject.h"
 //#include "Eigen/QuaternionBase"
 
 using namespace std;
+using KDTree = nanoflann::KDTreeEigenMatrixAdaptor<Eigen::MatrixX3d, 3, nanoflann::metric_L2_Simple>;
+
 
 //happly::PLYData bunny_ply("bun000.ply");
 
@@ -30,8 +33,26 @@ double ICP::distance(Eigen::Vector3d src, Eigen::Vector3d dst)
 	return abs(diff.norm());
 }
 
+std::map<int, std::pair<int, double>> ICP::closest_point_fast(const Eigen::MatrixX3d& src, const Eigen::MatrixX3d& dst)
+{
+	KDTree kd(3, dst, 10);
+	kd.index->buildIndex();
+	nanoflann::KNNResultSet<double> results(1);
+	size_t best_index;
+	double best_distance;
+	nanoflann::SearchParams params;
 
-std::map<int, std::pair<int, double>> ICP::nearest_neighbor(const Eigen::MatrixX3d& src, const Eigen::MatrixX3d& dst) 
+	std::map<int, std::pair<int, double>> pairs;
+
+	for (int i = 0; i < src.rows(); ++i)
+	{
+		results.init(&best_index, &best_distance);
+		kd.index->findNeighbors(results, src.row(i).data() , params);
+		pairs.insert(std::pair<int, std::pair<int, double>>(i, std::pair<int, double>(best_index, sqrt(best_distance))));
+	}
+		return pairs;
+}
+std::map<int, std::pair<int, double>> ICP::closest_point_slow(const Eigen::MatrixX3d& src, const Eigen::MatrixX3d& dst) 
 {
 	int row_src = src.rows();
 	int row_dst = dst.rows();
@@ -43,12 +64,12 @@ std::map<int, std::pair<int, double>> ICP::nearest_neighbor(const Eigen::MatrixX
 	std::map<int, std::pair<int, double>> closest_pairs;
 
 	for (int i = 0; i < row_src; i++) {
-		vec_src = Eigen::Vector3d(src.block<1, 3>(i, 0).transpose());
+		vec_src = src.block<1, 3>(i, 0);
 		min = 100;
 		index = 0;
 		dist_temp = 0;
 		for (int j = 0; j < row_dst; j++) {
-			vec_dst = Eigen::Vector3d(dst.block<1, 3>(j, 0).transpose());
+			vec_dst = dst.block<1,3>(j,0);
 			dist_temp = distance(vec_src, vec_dst);
 			if (dist_temp < min) {
 				min = dist_temp;
@@ -58,6 +79,8 @@ std::map<int, std::pair<int, double>> ICP::nearest_neighbor(const Eigen::MatrixX
 		std::pair<int, double> jmin(index, min);
 		std::pair<int, std::pair<int, double>> imin(i, jmin);
 		closest_pairs.insert(imin);
+		cout << src.row(i) << " - " << dst.row(index) << " - " << min << endl;
+
 	}
 
 	return closest_pairs;
@@ -163,9 +186,9 @@ Eigen::Quaterniond ICP::calculate_max_eigen(Eigen::Matrix4d mat)
 double ICP::calculate_mean_squared_error(std::map<int, std::pair<int, double>> pairs)
 {
 	double meansquared = 0;
-	for (auto pair : pairs)
+	for (const auto pair : pairs)
 	{
-		meansquared += pow(pair.second.second, 2);
+		meansquared +=  pow(pair.second.second, 2);
 	}
 	meansquared /= pairs.size();
 	return meansquared;
@@ -216,7 +239,7 @@ Eigen::MatrixX3d ICP::run_ICP(Eigen::MatrixX3d src, Eigen::MatrixX3d dst, int ma
 	double error = 10000000; //sok
 	while (i<maxiter && error>minerror)
 	{
-		std::map<int, std::pair<int, double>> closest_pairs = ICP::nearest_neighbor(src, dst);
+		std::map<int, std::pair<int, double>> closest_pairs = ICP::closest_point_slow(src, dst);
 		error = calculate_mean_squared_error(closest_pairs);
 		cout << i << ". iteration: error =  " << error << endl;
 		src = ICPIteration(src, dst, closest_pairs);

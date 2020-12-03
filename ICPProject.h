@@ -10,7 +10,8 @@ namespace ICP
 {
 	void WriteToOBJ(string filename, Eigen::MatrixX3d mat);
 	double distance(Eigen::Vector3d src, Eigen::Vector3d dst);
-	std::map<int, std::pair<int, double>> nearest_neighbor(const Eigen::MatrixX3d& src, const Eigen::MatrixX3d& dst);
+	std::map<int, std::pair<int, double>> closest_point_slow(const Eigen::MatrixX3d& src, const Eigen::MatrixX3d& dst);
+	std::map<int, std::pair<int, double>> closest_point_fast(const Eigen::MatrixX3d& src, const Eigen::MatrixX3d& dst);
 	Eigen::MatrixX3d load_vertices(happly::PLYData& data);
 	Eigen::MatrixX3d initialTransform(double rad_angle, Eigen::Vector3d axis, Eigen::MatrixX3d vertices);
 	Eigen::Vector4d calculate_center_of_mass(Eigen::MatrixX3d vertices);
